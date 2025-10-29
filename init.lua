@@ -90,6 +90,58 @@ P.S. You can delete this when you're done too. It's your config now! :)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
+-- personal configs
+
+local function set_transparent()
+  vim.cmd [[
+    hi Normal ctermbg=none guibg=none
+    hi NormalNC ctermbg=none guibg=none
+    hi SignColumn ctermbg=none guibg=none
+    hi LineNr ctermbg=none guibg=none
+    hi EndOfBuffer ctermbg=none guibg=none
+    hi VertSplit ctermbg=none guibg=none
+    ]]
+end
+
+local opts = { noremap = true, silent = true }
+
+-- ThePrimeagen remaps
+vim.keymap.set('n', '<leader>pv', vim.cmd.Ex)
+
+-- Save, quit, and save+quit
+vim.keymap.set('n', '<leader>s', ':w<CR>', opts)
+vim.keymap.set('n', '<leader>q', ':q<CR>', opts)
+vim.keymap.set('n', '<leader>x', ':x<CR>', opts)
+
+-- Scroll and movement bindings
+vim.keymap.set('n', '<leader>b', '<C-b>', opts)
+vim.keymap.set('n', '<leader>d', '<C-d>zz', opts)
+vim.keymap.set('n', '<leader>u', '<C-u>zz', opts)
+vim.keymap.set('n', '<leader>e', '<C-e>', opts)
+vim.keymap.set('n', '<leader>y', '<C-y>', opts)
+
+-- Redo
+vim.keymap.set('n', '<leader>r', '<C-r>', opts)
+
+-- Buffers navigation
+vim.keymap.set('n', '<leader>n', ':bnext<CR>', opts)
+vim.keymap.set('n', '<leader>t', '<C-^>', opts)
+
+-- INSERT MODE bindings
+vim.keymap.set('i', 'jj', '<Esc>', opts)
+
+vim.opt.number = true
+vim.opt.relativenumber = true
+
+-- Apply transparency on startup
+set_transparent()
+
+-- Reapply after changing colorscheme
+vim.api.nvim_create_autocmd('ColorScheme', {
+  pattern = '*',
+  callback = set_transparent,
+})
+
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = false
 
@@ -174,7 +226,7 @@ vim.o.confirm = true
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
 -- Diagnostic keymaps
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+vim.keymap.set('n', '<leader>qq', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -344,9 +396,9 @@ require('lazy').setup({
 
       -- Document existing key chains
       spec = {
-        { '<leader>s', group = '[S]earch' },
-        { '<leader>t', group = '[T]oggle' },
-        { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+        { '<leader>ss', group = '[S]earch' },
+        { '<leader>tt', group = '[T]oggle' },
+        { '<leader>hh', group = 'Git [H]unk', mode = { 'n', 'v' } },
       },
     },
   },
@@ -428,7 +480,7 @@ require('lazy').setup({
       local builtin = require 'telescope.builtin'
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
-      vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
+      vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
       vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
