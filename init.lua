@@ -3,6 +3,10 @@ vim.cmd 'filetype plugin indent on'
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
+-- Netrew disabled globally
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
 -- personal configs
 local function set_transparent()
   vim.cmd [[
@@ -37,14 +41,14 @@ vim.opt.relativenumber = true
 
 -- Save, quit, and save+quit
 map('n', '<leader>s', ':w<CR>', opts)
-map('n', '<leader>q', ':q<CR>', opts)
+-- map('n', '<leader>q', ':q<CR>', opts)
 map('n', '<leader>x', ':x<CR>', opts)
+map('n', '<leader>bn', ':bd<CR>', opts)
 
 -- Formatting
 -- map('n', '<leader>=', ':%!prettier --stdin-filepath %<CR>', opts)
 
 -- Scroll and movement bindings
-map('n', '<leader>b', '<C-b>', opts)
 map('n', '<leader>d', '<C-d>zz', opts)
 map('n', '<leader>u', '<C-u>zz', opts)
 map('n', '<leader>e', '<C-e>', opts)
@@ -78,7 +82,7 @@ vim.api.nvim_create_autocmd('ColorScheme', {
 })
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 --  For more options, you can see `:help option-list`
@@ -172,6 +176,12 @@ map('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 -- map("n", "<C-S-j>", "<C-w>J", { desc = "Move window to the lower" })
 -- map("n", "<C-S-k>", "<C-w>K", { desc = "Move window to the upper" })
 
+-- nvim treesitter-context
+
+map('n', '[c', function()
+  require('treesitter-context').go_to_context(vim.v.count1)
+end, { silent = true })
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
@@ -203,6 +213,46 @@ if ok then
     },
   }
 end
+local augroup = vim.api.nvim_create_augroup('JSFoldsGroup', { clear = true })
+
+function _G.JSFolds()
+  local line = vim.fn.getline(vim.v.lnum)
+
+  if line:match '^%s*$' then
+    return '-1'
+  end
+
+  if line:match '^import.*$' then
+    return 1
+  else
+    return vim.fn.indent(vim.v.lnum) / vim.bo.shiftwidth
+  end
+end
+
+vim.api.nvim_create_autocmd('FileType', {
+  group = augroup,
+  pattern = {
+    'javascript', -- .js
+    'javascriptreact', -- .jsx
+    'typescript', -- .ts
+    'typescriptreact', -- .tsx
+  },
+  callback = function()
+    vim.opt_local.foldmethod = 'expr'
+    vim.opt_local.foldexpr = 'v:lua.JSFolds()'
+  end,
+})
+
+-- 👇 After buffer loads, close only import folds
+vim.api.nvim_create_autocmd('BufReadPost', {
+  group = augroup,
+  pattern = { '*.js', '*.jsx', '*.ts', '*.tsx' },
+  callback = function()
+    vim.schedule(function()
+      vim.cmd 'silent! g/^import/normal! zc'
+    end)
+  end,
+})
 
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
@@ -251,3 +301,27 @@ require('lazy').setup('plugins', {
     },
   },
 })
+
+-- nvim treesitter context background cursor line transparency, running after colortheme
+vim.cmd [[
+  highlight clear TreesitterContext
+  highlight TreesitterContext guibg=NONE guifg=#FFFFFF
+]]
+
+-- Use your terminal's magenta with transparency effect
+local shades = {
+  -- Section order: Mode, Filename, Fileinfo, Location
+  MiniStatuslineModeNormal = { bg = '#7C3A6C', fg = '#FFFFFF', bold = true },
+  MiniStatuslineModeInsert = { bg = '#6E3360', fg = '#FFFFFF' },
+  MiniStatuslineModeVisual = { bg = '#5A2B4F', fg = '#FFFFFF' },
+  MiniStatuslineModeReplace = { bg = '#2D1428', fg = '#FFFFFF' },
+  MiniStatuslineModeCommand = { bg = '#6E3360', fg = '#FFFFFF' },
+  MiniStatuslineModeOther = { bg = '#2D1428', fg = '#E0E0E0' },
+  MiniStatuslineFilename = { bg = '#421D3A', fg = '#E0E0E0', bold = true },
+  MiniStatuslineFileinfo = { bg = '#5A2B4F', fg = '#C0C0C0' },
+  MiniStatuslineLocation = { bg = '#2D1428', fg = '#FFFFFF', bold = true },
+}
+
+for group, _opts in pairs(shades) do
+  vim.api.nvim_set_hl(0, group, _opts)
+end

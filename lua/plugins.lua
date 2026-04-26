@@ -91,6 +91,7 @@ return {
       }
       -- Load the colorscheme here.
       vim.cmd.colorscheme 'vscode'
+      vim.api.nvim_set_hl(0, 'CursorLine', { bg = '#421D3A' }) -- Standard magenta
     end,
   },
 
@@ -804,61 +805,100 @@ return {
     end,
   },
 
-  -- { -- Highlight, edit, and navigate codek
-  --   'nvim-treesitter/nvim-treesitter',
-  --   opts = {
-  --     ensure_installed = {
-  --       'bash',
-  --       'c',
-  --       'diff',
-  --       'html',
-  --       'lua',
-  --       'luadoc',
-  --       'markdown',
-  --       'markdown_inline',
-  --       'query',
-  --       'vim',
-  --       'vimdoc',
-  --       'javascript',
-  --       'typescript',
-  --       'python',
-  --       'tsx',
-  --       'jsx',
-  --     },
-  --     -- Autoinstall languages that are not installed
-  --     auto_install = true,
-  --     highlight = {
-  --       enable = true,
-  --       -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
-  --       --  If you are experiencing weird indenting issues, add the language to
-  --       --  the list of additional_vim_regex_highlighting and disabled languages for indent.
-  --       -- additional_vim_regex_highlighting = { 'ruby' },
-  --       additional_vim_regex_highlighting = false,
-  --     },
-  --     indent = { enable = true, disable = { 'ruby' } },
-  --     run = ':TSUpdate',
-  --   },
-  --   -- There are additional nvim-treesitter modules that you can use to interact
-  --   -- with nvim-treesitter. You should go explore a few and see what interests you:
-  --   --
-  --   --    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
-  --   --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
-  --   --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
-  -- },
+  {
+    'NeogitOrg/neogit',
+    lazy = true,
+    dependencies = {
+      'nvim-lua/plenary.nvim', -- required
 
-  -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
-  -- init.lua. If you want these files, they are in the repository, so you can just download them and
-  -- place them in the correct locations.
+      -- Only one of these is needed.
+      'sindrets/diffview.nvim', -- optional
+      'esmuellert/codediff.nvim', -- optional
+
+      -- For a custom log pager
+      'm00qek/baleia.nvim', -- optional
+
+      -- Only one of these is needed.
+      'nvim-telescope/telescope.nvim', -- optional
+      'ibhagwan/fzf-lua', -- optional
+      'nvim-mini/mini.pick', -- optional
+      'folke/snacks.nvim', -- optional
+    },
+    cmd = 'Neogit',
+    keys = {
+      { '<leader>gg', '<cmd>Neogit<cr>', desc = 'Show Neogit UI' },
+    },
+  },
+
+  -- GitHub Copilot
+  -- NOTE: This plugin is currently disabled until DSA done. To enable it, set `enabled = true` in the plugin specification below.
+
+  {
+    'zbirenbaum/copilot.lua',
+    enabled = false, -- Set to true to enable Copilot
+    cmd = 'Copilot',
+    event = 'InsertEnter',
+    config = function()
+      require('copilot').setup {
+        suggestion = {
+          enabled = true,
+          auto_trigger = true,
+          keymap = {
+            accept = '<M-l>', -- Alt+l to accept
+            accept_word = '<M-w>', -- Alt+w to accept word
+            accept_line = '<M-e>', -- Alt+e to accept line
+            next = '<M-]>', -- Alt+] for next suggestion
+            prev = '<M-[>', -- Alt+[ for previous suggestion
+            dismiss = '<C-]>', -- Ctrl+] to dismiss
+          },
+        },
+        panel = { enabled = false },
+      }
+    end,
+  },
+
+  -- Tree sitter context for having the current function name on top of file
+
+  {
+    'nvim-treesitter/nvim-treesitter-context',
+    config = function()
+      require('treesitter-context').setup {
+        enable = true, -- Enable this plugin (Can be enabled/disabled later via commands)
+        multiwindow = false, -- Enable multiwindow support.
+        max_lines = 0, -- How many lines the window should span. Values <= 0 mean no limit.
+        min_window_height = 0, -- Minimum editor window height to enable context. Values <= 0 mean no limit.
+        line_numbers = true,
+        multiline_threshold = 20, -- Maximum number of lines to show for a single context
+        trim_scope = 'outer', -- Which context lines to discard if `max_lines` is exceeded. Choices: 'inner', 'outer'
+        mode = 'cursor', -- Line used to calculate context. Choices: 'cursor', 'topline'
+        -- Separator between context and content. Should be a single character string, like '-'.
+        -- When separator is set, the context will only show up when there are at least 2 lines above cursorline.
+        separator = nil,
+        zindex = 20, -- The Z-index of the context window
+      }
+    end,
+  },
+
+  --NOTE: This plugin offers a two-in-one command that replaces text covered by a {motion}, entire line(s) or the current selection with the contents of a register; the old text is deleted into the black-hole register, i.e. it's gone. (But of course, the command can be easily undone.)
+
+  {
+    'vim-scripts/ReplaceWithRegister',
+    keys = {
+      -- Maps "gr" to the plugin's operator in Normal mode
+      { '<leader>gr', '<Plug>ReplaceWithRegisterOperator', mode = 'n', desc = 'Replace with register' },
+      -- Maps "gr" in Visual mode
+      { '<leader>gr', '<Plug>ReplaceWithRegisterVisual', mode = 'x', desc = 'Replace with register' },
+      -- Maps "grr" to replace the current line
+      { '<leader>grr', '<Plug>ReplaceWithRegisterLine', mode = 'n', desc = 'Replace line with register' },
+    },
+  },
 
   -- NOTE: Next step on your Neovim journey: Add/Configure additional plugins for Kickstart
-  --
-  --  Here are some example plugins that I've included in the Kickstart repository.
-  --  Uncomment any of the lines below to enable them (you will need to restart nvim).
-  --
+
+  require 'kickstart.plugins.indent_line',
+  require 'kickstart.plugins.autopairs',
   -- require 'kickstart.plugins.debug',
-  -- require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
-  -- require 'kickstart.plugins.autopairs',
   -- require 'kickstart.plugins.neo-tree',
   -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
