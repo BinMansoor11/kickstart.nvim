@@ -85,13 +85,13 @@ return {
     config = function()
       vim.o.background = 'dark'
       require('vscode').setup {
+        variant = 'moder-dark',
         transparent = true,
         italic = false,
         disable_nvimtree_bg = true,
       }
       -- Load the colorscheme here.
       vim.cmd.colorscheme 'vscode'
-      vim.api.nvim_set_hl(0, 'CursorLine', { bg = '#421D3A' }) -- Standard magenta
     end,
   },
 
@@ -890,6 +890,13 @@ return {
       { '<leader>gr', '<Plug>ReplaceWithRegisterVisual', mode = 'x', desc = 'Replace with register' },
       -- Maps "grr" to replace the current line
       { '<leader>grr', '<Plug>ReplaceWithRegisterLine', mode = 'n', desc = 'Replace line with register' },
+    },
+  },
+
+  {
+    'jiaoshijie/undotree',
+    keys = { -- load the plugin only when using it's keybinding:
+      { '<leader>u', "<cmd>lua require('undotree').toggle()<cr>" },
     },
   },
 
