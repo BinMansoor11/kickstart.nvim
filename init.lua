@@ -25,7 +25,6 @@ local opts = { noremap = true, silent = true }
 
 -- ThePrimeagen remaps
 map('n', '<leader>pv', vim.cmd.Ex)
-map('n', '<leader>ls', ':Lazy update<Cr>', opts)
 vim.opt.syntax = 'on'
 vim.opt.hidden = true -- Enable background buffers
 vim.opt.hlsearch = false
@@ -41,36 +40,29 @@ vim.opt.relativenumber = true
 
 -- Save, quit, and save+quit
 map('n', '<leader>s', ':w<CR>', opts)
--- map('n', '<leader>q', ':q<CR>', opts)
 map('n', '<leader>x', ':x<CR>', opts)
-map('n', '<leader>bn', ':bd<CR>', opts)
-
--- Formatting
--- map('n', '<leader>=', ':%!prettier --stdin-filepath %<CR>', opts)
+map('n', '<leader>bd', ':bd<CR>', opts)
 
 -- Scroll and movement bindings
-map('n', '<leader>d', '<C-d>zz', opts)
-map('n', '<leader>u', '<C-u>zz', opts)
+map('n', 'J', 'mzJ`z', opts)
+map('n', '<C-d>', '<C-d>zz', opts)
+map('n', '<C-u>', '<C-u>zz', opts)
+map('n', 'n', 'nzzzv', opts)
+map('n', 'N', 'Nzzzv', opts)
 map('n', '<leader>e', '<C-e>', opts)
 map('n', '<leader>y', '<C-y>', opts)
-map('n', '<leader>o', '<C-o>', opts)
-map('n', '<leader>i', '<C-i>', opts)
 
 -- Redo
 map('n', '<leader>r', '<C-r>', opts)
-
--- Buffers navigation
-map('n', '<leader>n', ':bnext<CR>', opts)
-map('n', '<leader>t', '<C-^>', opts)
-map('n', '<leader>o', '<C-o>', opts)
 
 -- INSERT MODE bindings
 map('i', 'jj', '<Esc>', opts)
 
 -- COMMANDS
 map('n', '<leader>mv', ':e $MYVIMRC<CR>', opts)
-map('n', '<A-Up>', ':m .-2<CR>==')
-map('n', '<A-Down>', ':m .+1<CR>==')
+map('v', 'J', ":m '>+1<CR>gv=gv")
+map('v', 'K', ":m '<-2<CR>gv=gv")
+map('n', 'Q', '<nop>')
 
 -- Apply transparency on startup
 set_transparent()
@@ -308,20 +300,41 @@ vim.cmd [[
   highlight TreesitterContext guibg=NONE guifg=#FFFFFF
 ]]
 
--- Use your terminal's magenta with transparency effect
+-- -- cursor line color
+-- vim.api.nvim_set_hl(0, 'CursorLine', { bg = '#421D3A' }) -- Standard magenta
+
+-- -- Use your terminal's magenta with transparency effect
+-- local shades = {
+--   -- Section order: Mode, Filename, Fileinfo, Location
+--   MiniStatuslineModeNormal = { bg = '#7C3A6C', fg = '#FFFFFF', bold = true },
+--   MiniStatuslineModeInsert = { bg = '#6E3360', fg = '#FFFFFF' },
+--   MiniStatuslineModeVisual = { bg = '#5A2B4F', fg = '#FFFFFF' },
+--   MiniStatuslineModeReplace = { bg = '#2D1428', fg = '#FFFFFF' },
+--   MiniStatuslineModeCommand = { bg = '#6E3360', fg = '#FFFFFF' },
+--   MiniStatuslineModeOther = { bg = '#2D1428', fg = '#E0E0E0' },
+--   MiniStatuslineFilename = { bg = '#421D3A', fg = '#E0E0E0', bold = true },
+--   MiniStatuslineFileinfo = { bg = '#5A2B4F', fg = '#C0C0C0' },
+--   MiniStatuslineLocation = { bg = '#2D1428', fg = '#FFFFFF', bold = true },
+-- }
+
+-- Statusline colors for Dark+ with background image opacity (Black Matte theme)
 local shades = {
   -- Section order: Mode, Filename, Fileinfo, Location
-  MiniStatuslineModeNormal = { bg = '#7C3A6C', fg = '#FFFFFF', bold = true },
-  MiniStatuslineModeInsert = { bg = '#6E3360', fg = '#FFFFFF' },
-  MiniStatuslineModeVisual = { bg = '#5A2B4F', fg = '#FFFFFF' },
-  MiniStatuslineModeReplace = { bg = '#2D1428', fg = '#FFFFFF' },
-  MiniStatuslineModeCommand = { bg = '#6E3360', fg = '#FFFFFF' },
-  MiniStatuslineModeOther = { bg = '#2D1428', fg = '#E0E0E0' },
-  MiniStatuslineFilename = { bg = '#421D3A', fg = '#E0E0E0', bold = true },
-  MiniStatuslineFileinfo = { bg = '#5A2B4F', fg = '#C0C0C0' },
-  MiniStatuslineLocation = { bg = '#2D1428', fg = '#FFFFFF', bold = true },
+  MiniStatuslineModeNormal = { bg = '#2A2A2A', fg = '#FFFFFF', bold = true },
+  MiniStatuslineModeInsert = { bg = '#3A3A3A', fg = '#FFFFFF' },
+  MiniStatuslineModeVisual = { bg = '#404040', fg = '#FFFFFF' },
+  MiniStatuslineModeReplace = { bg = '#1A1A1A', fg = '#FFFFFF' },
+  MiniStatuslineModeCommand = { bg = '#3A3A3A', fg = '#FFFFFF' },
+  MiniStatuslineModeOther = { bg = '#1A1A1A', fg = '#D0D0D0' },
+  MiniStatuslineFilename = { bg = '#222222', fg = '#E8E8E8', bold = true },
+  MiniStatuslineFileinfo = { bg = '#333333', fg = '#B0B0B0' },
+  MiniStatuslineLocation = { bg = '#1A1A1A', fg = '#FFFFFF', bold = true },
 }
 
 for group, _opts in pairs(shades) do
   vim.api.nvim_set_hl(0, group, _opts)
 end
+
+-- Keep statusline background transparent for your background image
+vim.api.nvim_set_hl(0, 'StatusLine', { bg = 'NONE' })
+vim.api.nvim_set_hl(0, 'StatusLineNC', { bg = 'NONE' })
