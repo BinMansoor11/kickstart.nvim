@@ -844,7 +844,7 @@ return {
           enabled = true,
           auto_trigger = true,
           keymap = {
-            accept = '<M-l>', -- Alt+l to accept
+            accept = '<CR>', -- Enter to accept
             accept_word = '<M-w>', -- Alt+w to accept word
             accept_line = '<M-e>', -- Alt+e to accept line
             next = '<M-]>', -- Alt+] for next suggestion
