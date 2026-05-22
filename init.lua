@@ -63,6 +63,7 @@ map('n', '<leader>mv', ':e $MYVIMRC<CR>', opts)
 map('v', 'J', ":m '>+1<CR>gv=gv")
 map('v', 'K', ":m '<-2<CR>gv=gv")
 map('n', 'Q', '<nop>')
+map('n', '<leader>tr', ':term<CR>', opts)
 
 -- Apply transparency on startup
 set_transparent()
