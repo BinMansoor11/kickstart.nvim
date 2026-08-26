@@ -45,7 +45,7 @@ vim.opt.number = true
 vim.opt.relativenumber = true
 
 vim.opt.fillchars = {
-  eob = " ",
+  eob = ' ',
 }
 
 -- Save, quit, and save+quit
@@ -59,8 +59,8 @@ map('n', '<C-d>', '<C-d>zz', opts)
 map('n', '<C-u>', '<C-u>zz', opts)
 map('n', 'n', 'nzzzv', opts)
 map('n', 'N', 'Nzzzv', opts)
-map('n', '<leader>e', '<C-e>', opts)
-map('n', '<leader>y', '<C-y>', opts)
+-- map('n', '<leader>e', '<C-e>', opts)
+-- map('n', '<leader>y', '<C-y>', opts)
 
 -- Redo
 map('n', '<leader>r', '<C-r>', opts)
