@@ -7,6 +7,12 @@ vim.g.maplocalleader = ' '
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
+-- This machine's PATH is missing the Windows PowerShell directory, and mason spawns
+-- `powershell` directly to install packages ("Could not find executable powershell in PATH").
+if vim.fn.has 'win32' == 1 and vim.fn.exepath 'powershell' == '' then
+  vim.env.PATH = vim.env.PATH .. ';' .. vim.env.SystemRoot .. [[\System32\WindowsPowerShell\v1.0]]
+end
+
 -- personal configs
 local function set_transparent()
   vim.cmd [[
@@ -37,6 +43,10 @@ vim.opt.autoindent = true
 
 vim.opt.number = true
 vim.opt.relativenumber = true
+
+vim.opt.fillchars = {
+  eob = " ",
+}
 
 -- Save, quit, and save+quit
 map('n', '<leader>s', ':w<CR>', opts)
