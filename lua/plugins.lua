@@ -570,22 +570,29 @@ return {
         'stylua', -- Used to format Lua code
         'prettierd',
         'prettier',
+        -- Installed for the tsserver binary it bundles, which typescript-tools
+        -- resolves via $MASON. The ts_ls client itself is skipped in the
+        -- mason-lspconfig handler below -- it would duplicate typescript-tools.
+        'typescript-language-server',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
+
+      -- mason-lspconfig 2.x removed `handlers` and enables every installed server
+      -- itself via vim.lsp.enable, so per-server settings are registered through
+      -- vim.lsp.config here instead. Under the old `handlers` block these never
+      -- applied at all.
+      for server_name, server in pairs(servers) do
+        server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+        vim.lsp.config(server_name, server)
+      end
 
       require('mason-lspconfig').setup {
         ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
         automatic_installation = false,
-        handlers = {
-          function(server_name)
-            local server = servers[server_name] or {}
-            -- This handles overriding only values explicitly passed
-            -- by the server configuration above. Useful when disabling
-            -- certain features of an LSP (for example, turning off formatting for ts_ls)
-            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-            require('lspconfig')[server_name].setup(server)
-          end,
-        },
+        -- typescript-tools owns the TypeScript client. Installing the
+        -- typescript-language-server package is enough for mason-lspconfig to
+        -- start ts_ls alongside it and double every diagnostic.
+        automatic_enable = { exclude = { 'ts_ls' } },
       }
     end,
   },
