@@ -4,8 +4,8 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Netrew disabled globally
--- vim.g.loaded_netrw = 1
--- vim.g.loaded_netrwPlugin = 1
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
 
 -- personal configs
 local function set_transparent()
@@ -339,3 +339,11 @@ end
 -- Keep statusline background transparent for your background image
 vim.api.nvim_set_hl(0, 'StatusLine', { bg = 'NONE' })
 vim.api.nvim_set_hl(0, 'StatusLineNC', { bg = 'NONE' })
+
+vim.api.nvim_set_hl(0, 'Folded', {
+  fg = '#505050', -- Text color
+  bg = '#222222', -- Background
+  bold = false, -- Make it bold
+  italic = false, -- Optional italic
+  underline = false, -- Optional underline
+})

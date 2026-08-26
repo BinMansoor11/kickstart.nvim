@@ -770,6 +770,7 @@ return {
 
   {
     'nvim-treesitter/nvim-treesitter',
+    commit = "cf12346a3414fa1b06af75c79faebe7f76df080a",
     build = ':TSUpdate', -- use build instead of run (modern)
     ---@diagnostic disable: missing-fields
     config = function()
@@ -899,6 +900,89 @@ return {
       { '<leader>u', "<cmd>lua require('undotree').toggle()<cr>" },
     },
   },
+
+  --NOTE: Neo-tree, vscode file system like behaviour
+  {
+    "nvim-neo-tree/neo-tree.nvim",
+    branch = "v3.x",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "MunifTanjim/nui.nvim",
+      "nvim-tree/nvim-web-devicons",
+    },
+      config = function()
+    require("neo-tree").setup({
+      window = {
+        width = 30,
+      },
+    })
+
+      vim.keymap.set("n", "<leader>e", "<cmd>Neotree toggle<cr>", {
+        desc = "Toggle Neo-tree",
+      })
+    end,
+  },
+  {
+    "Crysthamus/nvim-file-operations",
+    -- branch = "compat" -- if you are on Neovim <= 0.10
+    dependencies = {
+      "nvim-neo-tree/neo-tree.nvim", -- makes sure that this loads after Neo-tree.
+    },
+    config = function()
+      require("nvim-file-operations").setup()
+    end,
+  },
+  {
+    "s1n7ax/nvim-window-picker",
+    version = "2.*",
+    config = function()
+      require("window-picker").setup({
+        filter_rules = {
+          include_current_win = false,
+          autoselect_one = true,
+          -- filter using buffer options
+          bo = {
+            -- if the file type is one of following, the window will be ignored
+            filetype = { "neo-tree", "neo-tree-popup", "notify" },
+            -- if the buffer type is one of following, the window will be ignored
+            buftype = { "terminal", "quickfix" },
+          },
+        },
+      })
+    end,
+  },
+
+  {
+    "sindrets/diffview.nvim",
+    dependencies = {
+      "nvim-tree/nvim-web-devicons",
+    },
+    config = function()
+      require("diffview").setup({
+        view = {
+          default = {
+            layout = "diff2_horizontal",
+          },
+          file_history = {
+            layout = "diff2_horizontal",
+          },
+        },
+      })
+
+    vim.keymap.set("n", "<leader>gd", "<cmd>DiffviewOpen<cr>", {
+      desc = "Open Git diff",
+    })
+
+    vim.keymap.set("n", "<leader>gD", "<cmd>DiffviewClose<cr>", {
+      desc = "Close Git diff",
+    })
+
+      vim.keymap.set("n", "<leader>gh", "<cmd>DiffviewFileHistory %<cr>", {
+        desc = "File Git history",
+      })
+    end,
+  },
+
 
   -- NOTE: Next step on your Neovim journey: Add/Configure additional plugins for Kickstart
 
