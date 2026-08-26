@@ -243,6 +243,9 @@ vim.api.nvim_create_autocmd('FileType', {
   callback = function()
     vim.opt_local.foldmethod = 'expr'
     vim.opt_local.foldexpr = 'v:lua.JSFolds()'
+    -- foldlevel defaults to 0, which closes every indented fold on open.
+    -- The BufReadPost autocmd below is what closes the import block.
+    vim.opt_local.foldlevel = 99
   end,
 })
 
