@@ -280,8 +280,42 @@ return {
     dependencies = {
       'nvim-lua/plenary.nvim',
       'neovim/nvim-lspconfig',
+      'saghen/blink.cmp',
     },
-    opts = {},
+    -- NOTE: configured here only. It is not an lspconfig server, so it must not
+    -- go in the `servers` table below -- that table is keyed by server name and
+    -- feeds vim.tbl_keys() into mason-tool-installer.
+    opts = function()
+      return {
+        capabilities = require('blink.cmp').get_lsp_capabilities(),
+
+        settings = {
+          separate_diagnostic_server = true,
+          publish_diagnostic_on = 'insert_leave',
+
+          tsserver_max_memory = 2048,
+
+          tsserver_file_preferences = {
+            includeInlayParameterNameHints = 'none',
+            includeInlayFunctionParameterTypeHints = false,
+            includeInlayVariableTypeHints = false,
+            includeInlayPropertyDeclarationTypeHints = false,
+            includeInlayFunctionLikeReturnTypeHints = false,
+            includeInlayEnumMemberValueHints = false,
+
+            includeCompletionsForModuleExports = false,
+            includeCompletionsWithInsertText = false,
+            includeAutomaticOptionalChainCompletions = false,
+            includeCompletionsForImportStatements = true,
+          },
+
+          tsserver_format_options = {
+            allowIncompleteCompletions = true,
+            allowRenameOfImportPath = true,
+          },
+        },
+      }
+    end,
   },
 
   {
@@ -502,36 +536,6 @@ return {
         --    https://github.com/pmizio/typescript-tools.nvim
         --
         -- But for many setups, the LSP (`ts_ls`) will work just fine
-        require('typescript-tools').setup {
-          capabilities = require('blink.cmp').get_lsp_capabilities(),
-
-          settings = {
-            separate_diagnostic_server = true,
-            publish_diagnostic_on = 'insert_leave',
-
-            tsserver_max_memory = 2048,
-
-            tsserver_file_preferences = {
-              includeInlayParameterNameHints = 'none',
-              includeInlayFunctionParameterTypeHints = false,
-              includeInlayVariableTypeHints = false,
-              includeInlayPropertyDeclarationTypeHints = false,
-              includeInlayFunctionLikeReturnTypeHints = false,
-              includeInlayEnumMemberValueHints = false,
-
-              includeCompletionsForModuleExports = false,
-              includeCompletionsWithInsertText = false,
-              includeAutomaticOptionalChainCompletions = false,
-              includeCompletionsForImportStatements = true,
-            },
-
-            tsserver_format_options = {
-              allowIncompleteCompletions = true,
-              allowRenameOfImportPath = true,
-            },
-          },
-        },
-
         lua_ls = {
           -- cmd = { ... },
           -- filetypes = { ... },
