@@ -770,10 +770,36 @@ return {
 
   {
     'nvim-treesitter/nvim-treesitter',
-    commit = "cf12346a3414fa1b06af75c79faebe7f76df080a",
+    commit = 'cf12346a3414fa1b06af75c79faebe7f76df080a',
     build = ':TSUpdate', -- use build instead of run (modern)
     ---@diagnostic disable: missing-fields
     config = function()
+      -- nvim-treesitter master registers its predicates with `all = false`, an option
+      -- Neovim 0.12 removed: handlers now always receive TSNode[] where they expect a
+      -- single TSNode, so `#set-lang-from-info-string!` etc. crash on any injection
+      -- (markdown fenced blocks, html <script>). Unwrap the list for those handlers only.
+      -- ponytail: shim, drop it when migrating to the nvim-treesitter `main` branch.
+      local q = vim.treesitter.query
+      local add_predicate, add_directive = q.add_predicate, q.add_directive
+      local function unwrap(handler)
+        return function(match, ...)
+          local single = {}
+          for id, nodes in pairs(match) do
+            single[id] = type(nodes) == 'table' and nodes[#nodes] or nodes
+          end
+          return handler(single, ...)
+        end
+      end
+      q.add_predicate = function(name, handler, o)
+        return add_predicate(name, unwrap(handler), o)
+      end
+      q.add_directive = function(name, handler, o)
+        return add_directive(name, unwrap(handler), o)
+      end
+      package.loaded['nvim-treesitter.query_predicates'] = nil
+      require 'nvim-treesitter.query_predicates'
+      q.add_predicate, q.add_directive = add_predicate, add_directive
+
       require('nvim-treesitter.configs').setup {
         ensure_installed = {
           'bash',
@@ -903,86 +929,85 @@ return {
 
   --NOTE: Neo-tree, vscode file system like behaviour
   {
-    "nvim-neo-tree/neo-tree.nvim",
-    branch = "v3.x",
+    'nvim-neo-tree/neo-tree.nvim',
+    branch = 'v3.x',
     dependencies = {
-      "nvim-lua/plenary.nvim",
-      "MunifTanjim/nui.nvim",
-      "nvim-tree/nvim-web-devicons",
+      'nvim-lua/plenary.nvim',
+      'MunifTanjim/nui.nvim',
+      'nvim-tree/nvim-web-devicons',
     },
-      config = function()
-    require("neo-tree").setup({
-      window = {
-        width = 30,
-      },
-    })
+    config = function()
+      require('neo-tree').setup {
+        window = {
+          width = 25,
+        },
+      }
 
-      vim.keymap.set("n", "<leader>e", "<cmd>Neotree toggle<cr>", {
-        desc = "Toggle Neo-tree",
+      vim.keymap.set('n', '<leader>e', '<cmd>Neotree toggle<cr>', {
+        desc = 'Toggle Neo-tree',
       })
     end,
   },
   {
-    "Crysthamus/nvim-file-operations",
+    'Crysthamus/nvim-file-operations',
     -- branch = "compat" -- if you are on Neovim <= 0.10
     dependencies = {
-      "nvim-neo-tree/neo-tree.nvim", -- makes sure that this loads after Neo-tree.
+      'nvim-neo-tree/neo-tree.nvim', -- makes sure that this loads after Neo-tree.
     },
     config = function()
-      require("nvim-file-operations").setup()
+      require('nvim-file-operations').setup()
     end,
   },
   {
-    "s1n7ax/nvim-window-picker",
-    version = "2.*",
+    's1n7ax/nvim-window-picker',
+    version = '2.*',
     config = function()
-      require("window-picker").setup({
+      require('window-picker').setup {
         filter_rules = {
           include_current_win = false,
           autoselect_one = true,
           -- filter using buffer options
           bo = {
             -- if the file type is one of following, the window will be ignored
-            filetype = { "neo-tree", "neo-tree-popup", "notify" },
+            filetype = { 'neo-tree', 'neo-tree-popup', 'notify' },
             -- if the buffer type is one of following, the window will be ignored
-            buftype = { "terminal", "quickfix" },
+            buftype = { 'terminal', 'quickfix' },
           },
         },
-      })
+      }
     end,
   },
 
   {
-    "sindrets/diffview.nvim",
+    'sindrets/diffview.nvim',
     dependencies = {
-      "nvim-tree/nvim-web-devicons",
+      'nvim-tree/nvim-web-devicons',
     },
     config = function()
-      require("diffview").setup({
+      require('diffview').setup {
         view = {
           default = {
-            layout = "diff2_horizontal",
+            layout = 'diff2_horizontal',
           },
           file_history = {
-            layout = "diff2_horizontal",
+            layout = 'diff2_horizontal',
           },
         },
+      }
+
+      vim.keymap.set('n', '<leader>gd', '<cmd>DiffviewOpen<cr>', {
+        desc = 'Open Git diff',
       })
 
-    vim.keymap.set("n", "<leader>gd", "<cmd>DiffviewOpen<cr>", {
-      desc = "Open Git diff",
-    })
+      vim.keymap.set('n', '<leader>gD', '<cmd>DiffviewClose<cr>', {
+        desc = 'Close Git diff',
+      })
 
-    vim.keymap.set("n", "<leader>gD", "<cmd>DiffviewClose<cr>", {
-      desc = "Close Git diff",
-    })
-
-      vim.keymap.set("n", "<leader>gh", "<cmd>DiffviewFileHistory %<cr>", {
-        desc = "File Git history",
+      vim.keymap.set('n', '<leader>gh', '<cmd>DiffviewFileHistory %<cr>', {
+        desc = 'File Git history',
       })
     end,
   },
-
 
   -- NOTE: Next step on your Neovim journey: Add/Configure additional plugins for Kickstart
 
