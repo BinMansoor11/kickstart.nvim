@@ -1020,6 +1020,14 @@ return {
     end,
   },
 
+  {
+    'easymotion/vim-easymotion',
+
+    config = function()
+      vim.keymap.set('n', 's', '<Plug>(easymotion-overwin-f2)', { remap = true, silent = true, desc = 'EasyMotion jump' })
+    end,
+  },
+
   -- NOTE: Next step on your Neovim journey: Add/Configure additional plugins for Kickstart
 
   require 'kickstart.plugins.indent_line',
