@@ -22,6 +22,8 @@ local function set_transparent()
     hi LineNr ctermbg=none guibg=none
     hi EndOfBuffer ctermbg=none guibg=none
     hi VertSplit ctermbg=none guibg=none
+    hi CursorLine ctermbg=none guibg=none cterm=underline gui=underline guisp=#3A3A3A
+    hi CursorLineNr ctermbg=none guibg=none guifg=#FFFFFF gui=bold
     ]]
 end
 
@@ -136,6 +138,7 @@ vim.o.inccommand = 'split'
 
 -- Show which line your cursor is on
 vim.o.cursorline = true
+vim.o.cursorlineopt = 'both' -- underline the line and highlight its number; no background fill
 
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.o.scrolloff = 3
@@ -207,15 +210,6 @@ vim.opt.wildignore:append {
 -- Also ignore in file completion
 vim.opt.wildignorecase = true
 
--- For Telescope specifically
-local ok, telescope = pcall(require, 'telescope')
-if ok then
-  telescope.setup {
-    defaults = {
-      file_ignore_patterns = { 'node_modules', '%.next', 'dist' },
-    },
-  }
-end
 local augroup = vim.api.nvim_create_augroup('JSFoldsGroup', { clear = true })
 
 function _G.JSFolds()

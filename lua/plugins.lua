@@ -224,6 +224,17 @@ return {
         --   },
         -- },
         -- pickers = {}
+        defaults = {
+          -- whole folder names only, so `distance.ts` still shows; [/\\] covers Windows paths
+          file_ignore_patterns = {
+            '^node_modules[/\\]',
+            '[/\\]node_modules[/\\]',
+            '^dist[/\\]',
+            '[/\\]dist[/\\]',
+            '^%.next[/\\]',
+            '[/\\]%.next[/\\]',
+          },
+        },
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
@@ -952,6 +963,12 @@ return {
         window = {
           width = 25,
         },
+        filesystem = {
+          filtered_items = {
+            -- same folders telescope hides (telescope file_ignore_patterns above); press H in the tree to show them
+            hide_by_name = { 'node_modules', 'dist', '.next' },
+          },
+        },
       }
 
       vim.keymap.set('n', '<leader>e', '<cmd>Neotree toggle<cr>', {
@@ -1022,9 +1039,65 @@ return {
 
   {
     'easymotion/vim-easymotion',
-
     config = function()
       vim.keymap.set('n', 's', '<Plug>(easymotion-overwin-f2)', { remap = true, silent = true, desc = 'EasyMotion jump' })
+    end,
+  },
+
+  {
+    'ThePrimeagen/harpoon',
+    branch = 'harpoon2',
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'nvim-telescope/telescope.nvim',
+    },
+
+    config = function()
+      local harpoon = require 'harpoon'
+
+      harpoon:setup()
+
+      require('telescope').load_extension 'harpoon'
+
+      vim.keymap.set('n', '<leader>ha', function()
+        harpoon:list():add()
+      end, {
+        desc = '[H]arpoon [A]dd',
+      })
+
+      vim.keymap.set('n', '<leader>hh', function()
+        require('telescope').extensions.harpoon.marks()
+      end, {
+        desc = '[H]arpoon [H]ome',
+      })
+
+      vim.keymap.set('n', ']h', function()
+        harpoon:list():next()
+      end, {
+        desc = 'Next Harpoon file',
+      })
+
+      vim.keymap.set('n', '[h', function()
+        harpoon:list():prev()
+      end, {
+        desc = 'Previous Harpoon file',
+      })
+
+      vim.keymap.set('n', '<leader>1', function()
+        harpoon:list():select(1)
+      end)
+
+      vim.keymap.set('n', '<leader>2', function()
+        harpoon:list():select(2)
+      end)
+
+      vim.keymap.set('n', '<leader>3', function()
+        harpoon:list():select(3)
+      end)
+
+      vim.keymap.set('n', '<leader>4', function()
+        harpoon:list():select(4)
+      end)
     end,
   },
 
