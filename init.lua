@@ -56,16 +56,7 @@ vim.opt.fillchars = {
 
 -- Save, quit, and save+quit
 map('n', '<leader>s', ':w<CR>', opts)
-map('n', '<leader>x', function()
-  -- save + close this split; on the last file window quit everything, so neo-tree isn't left behind
-  -- as the window the session saves
-  local function is_file_win(w)
-    return vim.api.nvim_win_get_config(w).relative == '' and vim.bo[vim.api.nvim_win_get_buf(w)].buftype == ''
-  end
-  local last = is_file_win(0) and #vim.tbl_filter(is_file_win, vim.api.nvim_list_wins()) == 1
-  vim.cmd(last and 'xa' or 'x')
-end, { desc = 'Save + close split (quits on the last one)' })
-map('n', '<leader>X', ':xa<CR>', { desc = 'Save all + quit, keeping splits for the session' })
+map('n', '<leader>x', ':x<CR>', opts)
 map('n', '<leader>bd', ':bd<CR>', opts)
 
 -- Scroll and movement bindings

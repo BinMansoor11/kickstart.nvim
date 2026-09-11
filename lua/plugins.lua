@@ -1101,40 +1101,6 @@ return {
     end,
   },
 
-  --NOTE: Sessions, saved per project folder. Nothing restores on its own; use the keys below.
-  {
-    'folke/persistence.nvim',
-    event = 'BufReadPre',
-    opts = {},
-    config = function(_, opts)
-      require('persistence').setup(opts)
-
-      -- close neo-tree before saving (it would come back as a broken buffer) and before loading
-      -- (`nvim .` opens it with the cursor inside, and the session's `:only` would keep it, squeezing your file to 1 column)
-      vim.api.nvim_create_autocmd('User', {
-        pattern = { 'PersistenceSavePre', 'PersistenceLoadPre' },
-        callback = function(ev)
-          pcall(vim.cmd, 'Neotree close')
-          if ev.match == 'PersistenceSavePre' then
-            -- browsing up in neo-tree moves the tab's folder (tcd), and sessions are named after the
-            -- current folder; go back to the folder nvim started in so the session keeps the project's name
-            vim.cmd.cd(vim.fn.getcwd(-1, -1))
-          end
-        end,
-      })
-
-      vim.keymap.set('n', '<leader>qs', function()
-        require('persistence').load()
-      end, { desc = 'Restore session for this folder' })
-      vim.keymap.set('n', '<leader>ql', function()
-        require('persistence').load { last = true }
-      end, { desc = 'Restore last session' })
-      vim.keymap.set('n', '<leader>qd', function()
-        require('persistence').stop()
-      end, { desc = "Don't save this session" })
-    end,
-  },
-
   --NOTE: Folds from the LSP (typescript-tools), falling back to indent. Replaces the old JSFolds code.
   {
     'kevinhwang91/nvim-ufo',
