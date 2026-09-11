@@ -1040,7 +1040,7 @@ return {
   {
     'easymotion/vim-easymotion',
     config = function()
-      vim.keymap.set('n', 's', '<Plug>(easymotion-overwin-f2)', { remap = true, silent = true, desc = 'EasyMotion jump' })
+      vim.keymap.set('n', '<leader><leader>s', '<Plug>(easymotion-overwin-f2)', { remap = true, silent = true, desc = 'EasyMotion jump' })
     end,
   },
 
@@ -1098,6 +1098,72 @@ return {
       vim.keymap.set('n', '<leader>4', function()
         harpoon:list():select(4)
       end)
+    end,
+  },
+
+  --NOTE: Sessions, saved per project folder. Nothing restores on its own; use the keys below.
+  {
+    'folke/persistence.nvim',
+    event = 'BufReadPre',
+    opts = {},
+    config = function(_, opts)
+      require('persistence').setup(opts)
+
+      -- close neo-tree before saving (it would come back as a broken buffer) and before loading
+      -- (`nvim .` opens it with the cursor inside, and the session's `:only` would keep it, squeezing your file to 1 column)
+      vim.api.nvim_create_autocmd('User', {
+        pattern = { 'PersistenceSavePre', 'PersistenceLoadPre' },
+        callback = function(ev)
+          pcall(vim.cmd, 'Neotree close')
+          if ev.match == 'PersistenceSavePre' then
+            -- browsing up in neo-tree moves the tab's folder (tcd), and sessions are named after the
+            -- current folder; go back to the folder nvim started in so the session keeps the project's name
+            vim.cmd.cd(vim.fn.getcwd(-1, -1))
+          end
+        end,
+      })
+
+      vim.keymap.set('n', '<leader>qs', function()
+        require('persistence').load()
+      end, { desc = 'Restore session for this folder' })
+      vim.keymap.set('n', '<leader>ql', function()
+        require('persistence').load { last = true }
+      end, { desc = 'Restore last session' })
+      vim.keymap.set('n', '<leader>qd', function()
+        require('persistence').stop()
+      end, { desc = "Don't save this session" })
+    end,
+  },
+
+  --NOTE: Folds from the LSP (typescript-tools), falling back to indent. Replaces the old JSFolds code.
+  {
+    'kevinhwang91/nvim-ufo',
+    dependencies = { 'kevinhwang91/promise-async' },
+    event = 'BufReadPost',
+    init = function()
+      vim.o.foldenable = true
+      vim.o.foldlevel = 99 -- start with everything open...
+      vim.o.foldlevelstart = 99
+      -- fold icons in the gutter; foldinner hides the level digits nested folds would show
+      vim.o.foldcolumn = '1'
+      -- \u{f107} and \u{f105} are the Nerd Font angle-down / angle-right icons
+      vim.opt.fillchars:append { foldopen = '\u{f107}', foldclose = '\u{f105}', fold = ' ', foldsep = ' ', foldinner = ' ' }
+    end,
+    config = function()
+      require('ufo').setup {
+        close_fold_kinds_for_ft = { default = { 'imports' } }, -- ...except the import block
+        preview = {
+          win_config = {
+            winblend = 0, -- blending with the transparent background turns it black
+            winhighlight = 'Normal:Normal,FloatBorder:LineNr', -- see-through body, subtle grey border
+          },
+        },
+      }
+
+      -- ufo's own versions; the built-in zR/zM fight ufo over foldlevel
+      vim.keymap.set('n', 'zR', require('ufo').openAllFolds, { desc = 'Open all folds' })
+      vim.keymap.set('n', 'zM', require('ufo').closeAllFolds, { desc = 'Close all folds' })
+      vim.keymap.set('n', 'zK', require('ufo').peekFoldedLinesUnderCursor, { desc = 'Peek inside fold' })
     end,
   },
 

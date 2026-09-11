@@ -24,6 +24,10 @@ local function set_transparent()
     hi VertSplit ctermbg=none guibg=none
     hi CursorLine ctermbg=none guibg=none cterm=underline gui=underline guisp=#3A3A3A
     hi CursorLineNr ctermbg=none guibg=none guifg=#FFFFFF gui=bold
+    hi Folded ctermbg=none guibg=none guifg=#505050
+    hi FoldColumn ctermbg=none guibg=none
+    " ufo falls back to the Visual colour when Folded has no bg; point it at Normal instead
+    hi! link UfoFoldedBg Normal
     ]]
 end
 
@@ -52,7 +56,16 @@ vim.opt.fillchars = {
 
 -- Save, quit, and save+quit
 map('n', '<leader>s', ':w<CR>', opts)
-map('n', '<leader>x', ':x<CR>', opts)
+map('n', '<leader>x', function()
+  -- save + close this split; on the last file window quit everything, so neo-tree isn't left behind
+  -- as the window the session saves
+  local function is_file_win(w)
+    return vim.api.nvim_win_get_config(w).relative == '' and vim.bo[vim.api.nvim_win_get_buf(w)].buftype == ''
+  end
+  local last = is_file_win(0) and #vim.tbl_filter(is_file_win, vim.api.nvim_list_wins()) == 1
+  vim.cmd(last and 'xa' or 'x')
+end, { desc = 'Save + close split (quits on the last one)' })
+map('n', '<leader>X', ':xa<CR>', { desc = 'Save all + quit, keeping splits for the session' })
 map('n', '<leader>bd', ':bd<CR>', opts)
 
 -- Scroll and movement bindings
@@ -210,50 +223,6 @@ vim.opt.wildignore:append {
 -- Also ignore in file completion
 vim.opt.wildignorecase = true
 
-local augroup = vim.api.nvim_create_augroup('JSFoldsGroup', { clear = true })
-
-function _G.JSFolds()
-  local line = vim.fn.getline(vim.v.lnum)
-
-  if line:match '^%s*$' then
-    return '-1'
-  end
-
-  if line:match '^import.*$' then
-    return 1
-  else
-    return vim.fn.indent(vim.v.lnum) / vim.bo.shiftwidth
-  end
-end
-
-vim.api.nvim_create_autocmd('FileType', {
-  group = augroup,
-  pattern = {
-    'javascript', -- .js
-    'javascriptreact', -- .jsx
-    'typescript', -- .ts
-    'typescriptreact', -- .tsx
-  },
-  callback = function()
-    vim.opt_local.foldmethod = 'expr'
-    vim.opt_local.foldexpr = 'v:lua.JSFolds()'
-    -- foldlevel defaults to 0, which closes every indented fold on open.
-    -- The BufReadPost autocmd below is what closes the import block.
-    vim.opt_local.foldlevel = 99
-  end,
-})
-
--- 👇 After buffer loads, close only import folds
-vim.api.nvim_create_autocmd('BufReadPost', {
-  group = augroup,
-  pattern = { '*.js', '*.jsx', '*.ts', '*.tsx' },
-  callback = function()
-    vim.schedule(function()
-      vim.cmd 'silent! g/^import/normal! zc'
-    end)
-  end,
-})
-
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
@@ -346,11 +315,3 @@ end
 -- Keep statusline background transparent for your background image
 vim.api.nvim_set_hl(0, 'StatusLine', { bg = 'NONE' })
 vim.api.nvim_set_hl(0, 'StatusLineNC', { bg = 'NONE' })
-
-vim.api.nvim_set_hl(0, 'Folded', {
-  fg = '#505050', -- Text color
-  bg = '#222222', -- Background
-  bold = false, -- Make it bold
-  italic = false, -- Optional italic
-  underline = false, -- Optional underline
-})
