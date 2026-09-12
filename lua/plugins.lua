@@ -964,6 +964,9 @@ return {
           width = 25,
         },
         filesystem = {
+          -- browsing up in the tree no longer moves nvim's folder, so harpoon keeps one list per project
+          -- (it names its list after the current folder) and sibling-folder marks survive a restart
+          bind_to_cwd = false,
           filtered_items = {
             -- same folders telescope hides (telescope file_ignore_patterns above); press H in the tree to show them
             hide_by_name = { 'node_modules', 'dist', '.next' },
@@ -1037,11 +1040,30 @@ return {
     end,
   },
 
+  --NOTE: flash.nvim, replaces vim-easymotion. <leader><leader>s jumps anywhere on screen (any window),
+  -- and f/F/t/T show a label on every match in the line, so you pick one instead of pressing ; over and over.
   {
-    'easymotion/vim-easymotion',
-    config = function()
-      vim.keymap.set('n', '<leader><leader>s', '<Plug>(easymotion-overwin-f2)', { remap = true, silent = true, desc = 'EasyMotion jump' })
-    end,
+    'folke/flash.nvim',
+    event = 'VeryLazy',
+    opts = {
+      modes = {
+        char = {
+          enabled = true,
+          jump_labels = true,
+        },
+        search = { enabled = true }, -- label the matches while typing / or ?
+      },
+    },
+    keys = {
+      {
+        '<leader><leader>s',
+        mode = { 'n', 'x', 'o' },
+        function()
+          require('flash').jump()
+        end,
+        desc = 'Flash jump',
+      },
+    },
   },
 
   {
@@ -1057,6 +1079,24 @@ return {
 
       harpoon:setup()
 
+      -- harpoon leaves an empty slot when a mark is removed; its telescope picker crashes on empty
+      -- slots and numbers files differently from <leader>1-4. Close the gaps so the list is always 1..n.
+      -- ponytail: touches harpoon's internal `_length`; re-check if a harpoon update breaks removing marks
+      local function close_gaps(list)
+        local items = {}
+        for i = 1, list._length do
+          if list.items[i] ~= nil then
+            table.insert(items, list.items[i])
+          end
+        end
+        list.items, list._length = items, #items
+      end
+      harpoon:extend {
+        REMOVE = function(cx)
+          close_gaps(cx.list)
+        end,
+      }
+
       require('telescope').load_extension 'harpoon'
 
       vim.keymap.set('n', '<leader>ha', function()
@@ -1065,7 +1105,19 @@ return {
         desc = '[H]arpoon [A]dd',
       })
 
+      vim.keymap.set('n', '<leader>hr', function()
+        harpoon:list():remove()
+      end, {
+        desc = '[H]arpoon [R]emove current file',
+      })
+
+      -- Keys inside the <leader>hh picker:
+      --   Ctrl+d  remove the selected mark (asks y/n)
+      --   Ctrl+p  move the selected mark UP   (changes its <leader>1-4 number)
+      --   Ctrl+n  move the selected mark DOWN
+      --   In this picker Ctrl+p/n move the mark itself, not the cursor; use the arrow keys to just move around.
       vim.keymap.set('n', '<leader>hh', function()
+        close_gaps(harpoon:list()) -- a list saved with gaps before this fix loads with gaps too
         require('telescope').extensions.harpoon.marks()
       end, {
         desc = '[H]arpoon [H]ome',
