@@ -1185,6 +1185,20 @@ return {
     end,
   },
 
+  {
+    'shortcuts/no-neck-pain.nvim',
+    version = '*',
+    opts = {
+      width = 110,
+      autocmds = {
+        enableOnVimEnter = false,
+      },
+    },
+    keys = {
+      { '<leader>np', '<cmd>NoNeckPain<cr>', desc = 'Toggle centred layout' },
+    },
+  },
+
   -- NOTE: Next step on your Neovim journey: Add/Configure additional plugins for Kickstart
 
   require 'kickstart.plugins.indent_line',
