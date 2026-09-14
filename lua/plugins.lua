@@ -773,16 +773,18 @@ return {
       -- Simple and easy statusline.
       --  You could remove this setup call if you don't like it,
       --  and try some other statusline plugin
-      local statusline = require 'mini.statusline'
-      -- set use_icons to true if you have a Nerd Font
-      statusline.setup { use_icons = vim.g.have_nerd_font }
+      if not vim.g.vscode then -- VS Code has its own status bar; mini.ai/surround above still load there
+        local statusline = require 'mini.statusline'
+        -- set use_icons to true if you have a Nerd Font
+        statusline.setup { use_icons = vim.g.have_nerd_font }
 
-      -- You can configure sections in the statusline by overriding their
-      -- default behavior. For example, here we set the section for
-      -- cursor location to LINE:COLUMN
-      ---@diagnostic disable-next-line: duplicate-set-field
-      statusline.section_location = function()
-        return '%2l:%-2v'
+        -- You can configure sections in the statusline by overriding their
+        -- default behavior. For example, here we set the section for
+        -- cursor location to LINE:COLUMN
+        ---@diagnostic disable-next-line: duplicate-set-field
+        statusline.section_location = function()
+          return '%2l:%-2v'
+        end
       end
 
       -- ... and there is more!
@@ -1046,12 +1048,16 @@ return {
     'folke/flash.nvim',
     event = 'VeryLazy',
     opts = {
+      -- VS Code tabs are hidden Neovim windows that vscode-neovim swaps in and out, so a label placed in
+      -- another tab can point at a window that's gone by the time you jump ("Invalid window id").
+      -- Inside VS Code, stay in the current editor; native Neovim still jumps across splits.
+      search = { multi_window = not vim.g.vscode },
       modes = {
         char = {
           enabled = true,
           jump_labels = true,
         },
-        search = { enabled = true }, -- label the matches while typing / or ?
+        search = { enabled = true, search = { multi_window = not vim.g.vscode } }, -- label the matches while typing / or ?
       },
     },
     keys = {
@@ -1097,7 +1103,9 @@ return {
         end,
       }
 
-      require('telescope').load_extension 'harpoon'
+      if not vim.g.vscode then -- no telescope in VS Code
+        require('telescope').load_extension 'harpoon'
+      end
 
       vim.keymap.set('n', '<leader>ha', function()
         harpoon:list():add()
@@ -1118,7 +1126,16 @@ return {
       --   In this picker Ctrl+p/n move the mark itself, not the cursor; use the arrow keys to just move around.
       vim.keymap.set('n', '<leader>hh', function()
         close_gaps(harpoon:list()) -- a list saved with gaps before this fix loads with gaps too
-        require('telescope').extensions.harpoon.marks()
+        if vim.g.vscode then
+          -- no telescope in VS Code: show the marks as a notification instead
+          local names = {}
+          for i, item in ipairs(harpoon:list().items) do
+            names[i] = i .. ': ' .. vim.fn.fnamemodify(item.value, ':t')
+          end
+          require('vscode').notify(#names > 0 and table.concat(names, '   ') or 'No harpoon marks')
+        else
+          require('telescope').extensions.harpoon.marks()
+        end
       end, {
         desc = '[H]arpoon [H]ome',
       })

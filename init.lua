@@ -188,9 +188,11 @@ map('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
 -- nvim treesitter-context
 
-map('n', '[c', function()
-  require('treesitter-context').go_to_context(vim.v.count1)
-end, { silent = true })
+if not vim.g.vscode then -- treesitter-context doesn't load in VS Code
+  map('n', '[c', function()
+    require('treesitter-context').go_to_context(vim.v.count1)
+  end, { silent = true })
+end
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -241,6 +243,13 @@ rtp:prepend(lazypath)
 --
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup('plugins', {
+  defaults = {
+    -- inside VS Code (vscode-neovim) only the editing plugins load; VS Code's own UI replaces the rest.
+    -- `cond`, not `enabled`: a :Lazy clean run from VS Code must not delete the native-only plugins
+    cond = function(plugin)
+      return not vim.g.vscode or vim.tbl_contains({ 'mini.nvim', 'flash.nvim', 'ReplaceWithRegister', 'harpoon', 'plenary.nvim' }, plugin.name)
+    end,
+  },
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
     -- default lazy.nvim defined Nerd Font icons, otherwise define a unicode icons table
@@ -306,3 +315,8 @@ end
 -- Keep statusline background transparent for your background image
 vim.api.nvim_set_hl(0, 'StatusLine', { bg = 'NONE' })
 vim.api.nvim_set_hl(0, 'StatusLineNC', { bg = 'NONE' })
+
+-- VS Code (vscode-neovim): same keys, pointed at VS Code's own UI instead of the native-only plugins
+if vim.g.vscode then
+  require 'in_vscode'
+end
