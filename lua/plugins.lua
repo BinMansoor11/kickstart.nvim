@@ -633,7 +633,9 @@ return {
           return nil
         else
           return {
-            timeout_ms = 500,
+            -- prettierd on Windows: ~1.1s for the first format while its background helper starts, ~0.35s after.
+            -- 500 made the first save of every session time out.
+            timeout_ms = 2000,
             lsp_format = 'fallback',
           }
         end
