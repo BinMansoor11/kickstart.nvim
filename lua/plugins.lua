@@ -772,6 +772,13 @@ return {
       -- - sr)'  - [S]urround [R]eplace [)] [']
       require('mini.surround').setup()
 
+      -- Replace with register on <leader>r (<leader>riw, <leader>rr = line), off gr so the built-in LSP gr* maps stay.
+      -- exchange is off: its default gx would take over Neovim's built-in gx (open URL)
+      require('mini.operators').setup {
+        replace = { prefix = '<leader>r' },
+        exchange = { prefix = '' },
+      }
+
       -- Simple and easy statusline.
       --  You could remove this setup call if you don't like it,
       --  and try some other statusline plugin
@@ -930,20 +937,6 @@ return {
         zindex = 20, -- The Z-index of the context window
       }
     end,
-  },
-
-  --NOTE: This plugin offers a two-in-one command that replaces text covered by a {motion}, entire line(s) or the current selection with the contents of a register; the old text is deleted into the black-hole register, i.e. it's gone. (But of course, the command can be easily undone.)
-
-  {
-    'vim-scripts/ReplaceWithRegister',
-    keys = {
-      -- Maps "gr" to the plugin's operator in Normal mode
-      { '<leader>gr', '<Plug>ReplaceWithRegisterOperator', mode = 'n', desc = 'Replace with register' },
-      -- Maps "gr" in Visual mode
-      { '<leader>gr', '<Plug>ReplaceWithRegisterVisual', mode = 'x', desc = 'Replace with register' },
-      -- Maps "grr" to replace the current line
-      { '<leader>grr', '<Plug>ReplaceWithRegisterLine', mode = 'n', desc = 'Replace line with register' },
-    },
   },
 
   {
