@@ -68,9 +68,6 @@ map('n', 'N', 'Nzzzv', opts)
 -- map('n', '<leader>e', '<C-e>', opts)
 -- map('n', '<leader>y', '<C-y>', opts)
 
--- Redo
-map('n', '<leader>r', '<C-r>', opts)
-
 -- INSERT MODE bindings
 map('i', 'jj', '<Esc>', opts)
 
@@ -306,6 +303,21 @@ local shades = {
   MiniStatuslineFilename = { bg = '#222222', fg = '#E8E8E8', bold = true },
   MiniStatuslineFileinfo = { bg = '#333333', fg = '#B0B0B0' },
   MiniStatuslineLocation = { bg = '#1A1A1A', fg = '#FFFFFF', bold = true },
+
+  -- Git branch block (also colors diff counts, diagnostics and LSP info)
+  -- bg = background color, fg = text color
+  -- Try live first: :hi MiniStatuslineDevinfo guibg=#2E2E2E guifg=#E2C08D
+  --
+  -- Options (uncomment one, comment the others):
+  -- MiniStatuslineDevinfo = { bg = '#2E2E2E', fg = '#E8845F' }, -- git orange: git logo color, softened
+  -- MiniStatuslineDevinfo = { bg = '#2E2E2E', fg = '#81B88B' }, -- VS Code green: "added file" color, calm, matches Dark+
+  -- MiniStatuslineDevinfo = { bg = '#2E2E2E', fg = '#B392F0' }, -- muted purple: like GitHub branch labels, stands out the most
+  -- MiniStatuslineDevinfo = { bg = '#2A2A2A', fg = '#C27A5A' }, -- dim orange: quieter, doesn't pull your eye
+  -- MiniStatuslineDevinfo = { bg = '#2E2E2E', fg = '#C8C8C8' }, -- plain grey: no git color, matches the rest of the statusline
+  --
+  -- Background options (swap bg in the active line):
+  --   #1A1A1A darkest  #222222 dark  #2A2A2A medium  #2E2E2E medium-light  #333333 light
+  MiniStatuslineDevinfo = { bg = '#2E2E2E', fg = '#81B88B' },
 }
 
 for group, _opts in pairs(shades) do
