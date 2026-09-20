@@ -35,10 +35,7 @@ end
 local map = vim.keymap.set
 local opts = { noremap = true, silent = true }
 
--- ThePrimeagen remaps
-map('n', '<leader>pv', vim.cmd.Ex)
 vim.opt.syntax = 'on'
-vim.opt.hidden = true -- Enable background buffers
 vim.opt.hlsearch = false
 
 -- Indentation
@@ -63,16 +60,13 @@ map('n', '<leader>bd', ':bd<CR>', opts)
 map('n', 'J', 'mzJ`z', opts)
 map('n', '<C-d>', '<C-d>zz', opts)
 map('n', '<C-u>', '<C-u>zz', opts)
-map('n', 'n', 'nzzzv', opts)
-map('n', 'N', 'Nzzzv', opts)
--- map('n', '<leader>e', '<C-e>', opts)
--- map('n', '<leader>y', '<C-y>', opts)
+-- map('n', 'n', 'nzzzv', opts)
+-- map('n', 'N', 'Nzzzv', opts)
 
 -- INSERT MODE bindings
-map('i', 'jj', '<Esc>', opts)
+-- map('i', 'jj', '<Esc>', opts)
 
 -- COMMANDS
-map('n', '<leader>mv', ':e $MYVIMRC<CR>', opts)
 map('v', 'J', ":m '>+1<CR>gv=gv")
 map('v', 'K', ":m '<-2<CR>gv=gv")
 map('n', 'Q', '<nop>')
@@ -103,9 +97,10 @@ vim.o.mouse = 'ci'
 vim.o.showmode = false
 
 -- Sync clipboard between OS and Neovim.
-vim.schedule(function()
-  vim.o.clipboard = 'unnamedplus'
-end)
+-- NOTE: Will use "+y and "+p instead for a while
+-- vim.schedule(function()
+--   vim.o.clipboard = 'unnamedplus'
+-- end)
 
 -- Enable break indent
 vim.o.breakindent = true
@@ -142,7 +137,7 @@ vim.o.cursorline = true
 vim.o.cursorlineopt = 'both' -- underline the line and highlight its number; no background fill
 
 -- Minimal number of screen lines to keep above and below the cursor.
-vim.o.scrolloff = 3
+vim.o.scrolloff = 8
 
 -- if performing an operation that would fail due to unsaved changes in the buffer (like `:q`),
 -- instead raise a dialog asking if you wish to save the current file(s)
@@ -204,11 +199,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 })
 
 -- Ignore patterns globally (for Telescope, :find, etc.)
-vim.opt.wildignore:append {
-  '**/.next/*',
-  '**/dist/*',
-  '**/node_modules/*',
-}
+vim.opt.wildignore:append { '**/.next/*', '**/dist/*', '**/node_modules/*' }
 
 -- Also ignore in file completion
 vim.opt.wildignorecase = true
