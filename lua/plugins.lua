@@ -188,9 +188,6 @@ return {
         end,
       },
       { 'nvim-telescope/telescope-ui-select.nvim' },
-
-      -- Useful for getting pretty icons, but requires a Nerd Font.
-      { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
     },
     config = function()
       -- Telescope is a fuzzy finder that comes with a lot of different things that
@@ -765,6 +762,12 @@ return {
       --  - ci'  - [C]hange [I]nside [']quote
       require('mini.ai').setup { n_lines = 500 }
 
+      -- File/folder icons for telescope, neo-tree and diffview.
+      -- mock: those plugins ask for nvim-web-devicons; this makes that request return mini.icons instead,
+      -- so nvim-web-devicons is not installed any more. mini.nvim loads at startup, before them, so the mock is ready.
+      require('mini.icons').setup()
+      MiniIcons.mock_nvim_web_devicons()
+
       -- Add/delete/replace surroundings (brackets, quotes, etc.)
       --
       -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
@@ -953,7 +956,6 @@ return {
     dependencies = {
       'nvim-lua/plenary.nvim',
       'MunifTanjim/nui.nvim',
-      'nvim-tree/nvim-web-devicons',
     },
     config = function()
       require('neo-tree').setup {
@@ -1008,9 +1010,6 @@ return {
 
   {
     'sindrets/diffview.nvim',
-    dependencies = {
-      'nvim-tree/nvim-web-devicons',
-    },
     config = function()
       require('diffview').setup {
         view = {
