@@ -2,7 +2,7 @@
 -- Same keys as native Neovim, opening VS Code's own UI instead of the native-only plugins.
 -- Not named vscode.lua: that would hide the extension's own `require 'vscode'` module.
 -- Built into vscode-neovim already, so not mapped here: K/gh hover, gd definition, gH references,
--- gO document symbols, gc/gcc comment, zc/zo/za/zM/zR folds.
+-- gO document symbols, gc/gcc comment.
 -- Still real plugins in VS Code (see the allow-list in init.lua), so also not mapped here:
 -- mini.nvim (<leader>r replace-with-register, mini.ai, mini.surround), flash.nvim (<leader><leader>s),
 -- harpoon (<leader>ha, <leader>hr, <leader>hh, ]h, [h, <leader>1-4).
@@ -56,3 +56,15 @@ map('n', '<leader>np', act 'workbench.action.toggleCenteredLayout', { desc = 'To
 map('n', '<leader>qq', act 'workbench.actions.view.problems', { desc = 'Problems' }) -- diagnostic list
 map('n', '<leader>tr', act 'workbench.action.terminal.toggle', { desc = 'Terminal' }) -- toggle the terminal panel
 map('n', '<leader>bd', act 'workbench.action.closeActiveEditor', { desc = 'Close buffer' }) -- :bd leaves the tab open in VS Code
+
+-- folds: VS Code owns the folds here, Neovim knows nothing about them.
+-- The extension maps these itself, but only when Neovim does not grab the key first, which is why za sometimes did nothing.
+-- Mapping them explicitly always sends the VS Code command.
+map('n', 'za', act 'editor.toggleFold', { desc = 'Toggle fold' }) -- open/close the fold under the cursor
+map('n', 'zA', act 'editor.toggleFoldRecursively', { desc = 'Toggle fold recursively' }) -- same, with everything inside
+map('n', 'zo', act 'editor.unfold', { desc = 'Open fold' }) -- open one level
+map('n', 'zc', act 'editor.fold', { desc = 'Close fold' }) -- close one level
+map('n', 'zR', act 'editor.unfoldAll', { desc = 'Open all folds' }) -- ufo's zR in native
+map('n', 'zM', act 'editor.foldAll', { desc = 'Close all folds' }) -- ufo's zM in native
+map('n', 'zv', act 'editor.unfoldRecursively', { desc = 'Reveal cursor line' }) -- open everything around the cursor
+
