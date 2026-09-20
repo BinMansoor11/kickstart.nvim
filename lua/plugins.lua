@@ -1098,9 +1098,7 @@ return {
         end,
       }
 
-      if not vim.g.vscode then -- no telescope in VS Code
-        require('telescope').load_extension 'harpoon'
-      end
+      require('telescope').load_extension 'harpoon'
 
       vim.keymap.set('n', '<leader>ha', function()
         harpoon:list():add()
@@ -1121,16 +1119,7 @@ return {
       --   In this picker Ctrl+p/n move the mark itself, not the cursor; use the arrow keys to just move around.
       vim.keymap.set('n', '<leader>hh', function()
         close_gaps(harpoon:list()) -- a list saved with gaps before this fix loads with gaps too
-        if vim.g.vscode then
-          -- no telescope in VS Code: show the marks as a notification instead
-          local names = {}
-          for i, item in ipairs(harpoon:list().items) do
-            names[i] = i .. ': ' .. vim.fn.fnamemodify(item.value, ':t')
-          end
-          require('vscode').notify(#names > 0 and table.concat(names, '   ') or 'No harpoon marks')
-        else
-          require('telescope').extensions.harpoon.marks()
-        end
+        require('telescope').extensions.harpoon.marks()
       end, {
         desc = '[H]arpoon [H]ome',
       })

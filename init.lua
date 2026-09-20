@@ -237,7 +237,7 @@ require('lazy').setup('plugins', {
     -- inside VS Code (vscode-neovim) only the editing plugins load; VS Code's own UI replaces the rest.
     -- `cond`, not `enabled`: a :Lazy clean run from VS Code must not delete the native-only plugins
     cond = function(plugin)
-      return not vim.g.vscode or vim.tbl_contains({ 'mini.nvim', 'flash.nvim', 'ReplaceWithRegister', 'harpoon', 'plenary.nvim' }, plugin.name)
+      return not vim.g.vscode or vim.tbl_contains({ 'mini.nvim', 'flash.nvim', 'plenary.nvim' }, plugin.name)
     end,
   },
   ui = {

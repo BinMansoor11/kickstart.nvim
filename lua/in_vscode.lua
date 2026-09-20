@@ -4,8 +4,9 @@
 -- Built into vscode-neovim already, so not mapped here: K/gh hover, gd definition, gH references,
 -- gO document symbols, gc/gcc comment.
 -- Still real plugins in VS Code (see the allow-list in init.lua), so also not mapped here:
--- mini.nvim (<leader>r replace-with-register, mini.ai, mini.surround), flash.nvim (<leader><leader>s),
--- harpoon (<leader>ha, <leader>hr, <leader>hh, ]h, [h, <leader>1-4).
+-- mini.nvim (<leader>r replace-with-register, mini.ai, mini.surround) and flash.nvim (<leader><leader>s).
+-- harpoon is native-only: its buffer switching does not work through vscode-neovim,
+-- so VS Code's pinned tabs stand in for it below.
 local vscode = require 'vscode'
 local map = vim.keymap.set
 
@@ -68,3 +69,13 @@ map('n', 'zR', act 'editor.unfoldAll', { desc = 'Open all folds' }) -- ufo's zR 
 map('n', 'zM', act 'editor.foldAll', { desc = 'Close all folds' }) -- ufo's zM in native
 map('n', 'zv', act 'editor.unfoldRecursively', { desc = 'Reveal cursor line' }) -- open everything around the cursor
 
+-- pinned tabs: the harpoon stand-in. Pinned tabs sit first in the tab bar and do not close by accident,
+-- so <leader>1-4 lands on them the same way harpoon marks do in native Neovim.
+map('n', '<leader>hh', act 'workbench.action.pinEditor', { desc = 'Pin this file' }) -- harpoon add
+map('n', '<leader>hr', act 'workbench.action.unpinEditor', { desc = 'Unpin this file' }) -- harpoon remove
+map('n', ']h', act 'workbench.action.nextEditorInGroup', { desc = 'Next tab' }) -- harpoon next
+map('n', '[h', act 'workbench.action.previousEditorInGroup', { desc = 'Previous tab' }) -- harpoon previous
+map('n', '<leader>1', act 'workbench.action.openEditorAtIndex1', { desc = 'Tab 1' }) -- first tab, usually a pinned one
+map('n', '<leader>2', act 'workbench.action.openEditorAtIndex2', { desc = 'Tab 2' })
+map('n', '<leader>3', act 'workbench.action.openEditorAtIndex3', { desc = 'Tab 3' })
+map('n', '<leader>4', act 'workbench.action.openEditorAtIndex4', { desc = 'Tab 4' })
