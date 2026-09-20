@@ -1041,6 +1041,7 @@ return {
   -- and f/F/t/T show a label on every match in the line, so you pick one instead of pressing ; over and over.
   {
     'folke/flash.nvim',
+    cond = false,
     event = 'VeryLazy',
     opts = {
       -- VS Code tabs are hidden Neovim windows that vscode-neovim swaps in and out, so a label placed in
