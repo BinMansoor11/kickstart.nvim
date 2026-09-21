@@ -221,6 +221,37 @@ end
 local rtp = vim.opt.rtp
 rtp:prepend(lazypath)
 
+local claude_buf, code_buf
+
+local function toggle_claude()
+  local cur = vim.api.nvim_get_current_buf()
+
+  -- in Claude: go back to the code you came from
+  if cur == claude_buf then
+    if code_buf and vim.api.nvim_buf_is_valid(code_buf) then
+      vim.api.nvim_set_current_buf(code_buf)
+    end
+    return
+  end
+
+  -- in code: remember it, then go to Claude
+  code_buf = cur
+  if claude_buf and vim.api.nvim_buf_is_valid(claude_buf) then
+    vim.api.nvim_set_current_buf(claude_buf)
+  else
+    vim.cmd 'terminal claude --continue'
+    claude_buf = vim.api.nvim_get_current_buf()
+  end
+end
+
+vim.keymap.set({ 'n', 't' }, '<A-o>', toggle_claude, { desc = 'Toggle Claude Code' })
+
+-- start typing straight away when you return to Claude
+vim.api.nvim_create_autocmd('BufEnter', {
+  pattern = 'term://*',
+  command = 'startinsert',
+})
+
 -- [[ Configure and install plugins ]]
 --
 --  To check the current status of your plugins, run
