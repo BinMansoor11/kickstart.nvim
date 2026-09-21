@@ -10,6 +10,9 @@
 local vscode = require 'vscode'
 local map = vim.keymap.set
 
+-- init.lua sets 300ms; native which-key holds the leader open past that, but it doesn't load here
+vim.o.timeoutlen = 1000
+
 local function act(cmd)
   return function()
     vscode.action(cmd)
